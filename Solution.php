@@ -2,6 +2,7 @@
 
 namespace Task;
 
+use http\Client;
 use Introvert\ApiClient;
 use Introvert\ApiException;
 use Introvert\Configuration;
@@ -41,14 +42,10 @@ class Solution
             $html .= "</tr>";
         }
 
-        $globalSum = $table["global"];
-        $html .= "<tr>";
-        $html .= "<td></td>";
-        $html .= "<th>Total sum:</th>";
-        $html .= "<td>$globalSum</td>";
-        $html .= "</tr>";
-
         $html .= "</table>";
+
+        $globalSum = $table["global"];
+        $html .= "<p>Сумма по всем клиентам за период: $globalSum</p>";
 
         return $html;
     }
@@ -66,6 +63,7 @@ class Solution
             $api = $this->getApiClient($client['api']);
 
             if (!$this->hasAccess($api)) {
+                echo "Клиент {$client['name']} не имеет доступ в amoCRM";
                 continue;
             }
 
@@ -114,8 +112,7 @@ class Solution
         try {
             $api->account->info();
             return true;
-        } catch (ApiException $e) {
-            echo 'Exception when calling account->info: ', $e->getMessage(), PHP_EOL;
+        } catch (ApiException) {
             return false;
         }
     }
